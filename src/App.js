@@ -7,7 +7,8 @@ import Cart from './Components/Cart';
 import { getProducts } from "./Components/ApiCalls";
 
 import { connect } from "react-redux";
-import { setCategories } from './Redux/redux-actions/redux_actions';
+import { setCategories, } from './Redux/redux-actions/redux_actions';
+import { DeemScreen } from './Components/Navbar/NavbarElements';
 
 class App extends Component {
   componentDidMount() {
@@ -17,27 +18,35 @@ class App extends Component {
 
     <Router>
       <Navbar />
+
+      <DeemScreen show={this.props.showMiniCart}></DeemScreen>
       <Routes>
         {this.props.categories.map(route => {
           //we are mapping categories to display in app bar
           return <Route key={"router-" + route.name} path={route.name} element={<Category />} />
         })}
+        <Route path="/" element={<></>} />
+
         <Route path="viewproduct" element={<Products />} />
         <Route path="shopcard" element={<Cart />} />
 
       </Routes>
+
     </Router>
+
 
   );
 }
 const mapStateToProps = (state) => {
   return {
-    categories: state.ProductsReducer.categories
+    categories: state.ProductsReducer.categories,
+    showMiniCart: state.ProductsReducer.showMiniCart
+
   }
 }
 const mapDispatchToProps = () => {
   return {
-    setCategories
+    setCategories,
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps())(App)

@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { GridContainer, Grid, Card, Tith1, Styledspan, SpanPrice } from "../Components/WomanElements";
-import { getCategoryByTitle } from "../Components/ApiCalls";
-import { setSelectedCategories, setSelectedProduct } from '../Redux/redux-actions/redux_actions'
-import {
-  NavLink
-
-} from "../Components/Navbar/NavbarElements";
+import { GridContainer, Grid, Card, Tith1, Styledspan, SpanPrice, CategoryLink, CartImgContainer, CartImg } from "../Components/CategoryElements";
+import { getCategoryByTitle, getProductById } from "../Components/ApiCalls";
+import { setSelectedCategories, setSelectedProduct, addToCard } from '../Redux/redux-actions/redux_actions';
+import { PictureDiv } from '../Components/CartElements';
+import cartImg from "../Pictures/EmptyCart.png"
 class Category extends Component {
   constructor(props) {
     super(props);
     this.state = {
       category: null,
-      products: []
+      products: [],
+      showCartButton: ""
     };
   }
   componentDidMount() {
@@ -41,6 +40,27 @@ class Category extends Component {
 
     this.props.setSelectedProduct(productId)
   }
+  addToCart = (e, productId) => {
+    e.stopPropagation();
+    getProductById(productId).then(
+      res => res.json()
+    ).then(res => {
+
+      let selectedAtrrs = []
+      selectedAtrrs = res.data.product.attributes.map(el => {
+        return { name: el.name, value: el.items[0].value }
+      })
+      let submit = {
+        product: res.data.product,
+        selectedAtributes: selectedAtrrs,
+        count: 1
+      }
+      this.props.addToCard(submit)
+
+
+    })
+  }
+
   render = () => (
     <>
       <Tith1 >{this.state.category}</Tith1>
@@ -49,13 +69,23 @@ class Category extends Component {
         {this.state.products.map(product => {
 
           return <Grid key={"category-" + product.name + 1}>
-            <Card >
-              <NavLink onClick={() => this.onViewProduct(product.id)} to={"/viewproduct"} >
+            <Card onMouseEnter={e => {
+              this.setState({ showCartButton: product.id });
 
+            }}
+              onMouseLeave={e => {
+                this.setState({ showCartButton: "" });
+              }} >
 
-                <img style={{ width: "354px", height: "330px" }} src={product.gallery[0]} alt="fireSpot" />
-              </NavLink>
-              <Styledspan>{product.name}</Styledspan>
+              <CategoryLink onClick={() => this.onViewProduct(product.id)} to={"/viewproduct"} >
+
+                <PictureDiv outOfStock={product.inStock} img={product.gallery[0]} category >{product.inStock ? "OUT OF STOCK" : null}</PictureDiv>
+              </CategoryLink>
+              <CartImgContainer show={!product.inStock && this.state.showCartButton === product.id}>
+                <CartImg onClick={(e) => this.addToCart(e, product.id)} ><img src={cartImg} /></CartImg>
+              </CartImgContainer>
+
+              <Styledspan>{product.brand + " " + product.name}</Styledspan>
               <SpanPrice>{product.prices[0].currency.symbol + product.prices[0].amount}</SpanPrice>
 
             </Card>
@@ -76,7 +106,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = () => {
   return {
     setSelectedCategories,
-    setSelectedProduct
+    setSelectedProduct,
+    addToCard,
+
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps())(Category)

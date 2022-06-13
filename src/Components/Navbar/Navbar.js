@@ -4,16 +4,23 @@ import {
     NavLink,
     NavMenu,
     NavBtn,
-    LogoImg
+    LogoImg,
+    SelectButton,
+    SelectDiv,
+    ShopSpan,
+    ShopDiv,
+    ShopImg,
+    ShopButton,
+    CurrSpan
+
 } from "../Navbar/NavbarElements";
 import { getCurrencies } from "../../Components/ApiCalls";
 import { connect } from "react-redux";
-import { setSelectedCategories, setCurrency } from '../../Redux/redux-actions/redux_actions'
+import { setSelectedCategories, setCurrency, showMiniCart } from '../../Redux/redux-actions/redux_actions'
 import MiniCard from '../MiniCard';
 import shoppingCart from "../../Pictures/shoppingCart.png"
 
 import Logo from "../../Pictures/Logo.svg"
-
 
 class Navbar extends Component {
 
@@ -21,10 +28,28 @@ class Navbar extends Component {
         super(props);
         this.state = {
             currency: [],
-            showShop: false
+            showShop: false,
+            openCurrency: false,
+
         };
+        this.wrapperRef = React.createRef();
+        this.currencyRef = React.createRef();
+        this.handleClickOutside = this.handleClickOutside.bind(this);
+        this.handleClickOutsideCurrency = this.handleClickOutsideCurrency.bind(this);
+
     }
+
+
+    componentWillUnmount() {
+        document.removeEventListener("mousedown", this.handleClickOutside);
+        document.removeEventListener("mousedown", this.handleClickOutsideCurrency);
+
+
+    }
+
     componentDidMount() {
+        document.addEventListener("mousedown", this.handleClickOutside);
+        document.addEventListener("mousedown", this.handleClickOutsideCurrency);
         getCurrencies().then(
             res => res.json()
         ).then(res => {
@@ -34,72 +59,83 @@ class Navbar extends Component {
             this.props.setCurrency(res.data.currencies[0].symbol)
         })
     }
-    onSelect = (e) => {
-
-        this.props.setCurrency(e.target.value)
+    onSelect = (symbol) => {
+        this.setState({ openCurrency: false })
+        this.props.setCurrency(symbol)
     }
     onOpen = () => {
         this.setState({ showShop: !this.state.showShop })
+        this.props.showMiniCart(!this.state.showShop)
+
     }
+    openCurrency = () => {
+        this.setState({ openCurrency: !this.state.openCurrency })
+
+    }
+
+    handleClickOutside(event) {
+        if (this.wrapperRef && !this.wrapperRef.current.contains(event.target)) {
+            if (this.state.showShop) {
+
+
+                this.setState({ showShop: !this.state.showShop && this.state.showShop })
+                this.props.showMiniCart(false)
+            }
+        }
+    }
+
+    handleClickOutsideCurrency(event) {
+        if (this.currencyRef && !this.currencyRef.current.contains(event.target)) {
+            this.setState({ openCurrency: false })
+        }
+    }
+
+
     render = () => (
-        <>
-            <Nav>
-                <NavMenu>
-                    {this.props.categories ? this.props.categories.map(link => {
 
-                        return <NavLink key={"route-" + link.name} onClick={() => { this.props.setSelectedCategories(link.name) }} to={"/" + link.name} >
-                            {link.name}
-                        </NavLink>
-                    }) : null}
-
-                </NavMenu>
-
-                <LogoImg src={Logo} alt="logo" />
-
-                <NavBtn>
+        <Nav>
+            <NavMenu>
+                {this.props.categories ? this.props.categories.map(link => {
 
 
-                    <select onChange={this.onSelect} >
+                    return <NavLink key={"route-" + link.name} onClick={() => { this.props.setSelectedCategories(link.name) }} to={"/" + link.name} >
+                        {link.name}
+                    </NavLink>
+                }) : null}
+
+            </NavMenu>
+
+            <LogoImg src={Logo} alt="logo" />
+
+            <NavBtn>
+                <div ref={this.currencyRef}>
+                    <CurrSpan onClick={this.openCurrency}>{this.props.currency}{" ^"}</CurrSpan>
+
+                    <SelectDiv hide={this.state.openCurrency} onChange={this.onSelect}>
                         {this.state.currency.length > 0 ? this.state.currency.map(curr => {
 
-                            return <option key={"symbol-" + curr.symbol} value={curr.symbol} >{curr.symbol + " " + curr.label}</option>
+
+                            return <SelectButton onClick={e => this.onSelect(curr.symbol)} key={"symbol-" + curr.symbol} value={curr.symbol} >{curr.symbol + " " + curr.label}</SelectButton>
                         }) : null}
 
-                    </select>
-
-                    <button style={{ backgroundColor: "white", position: "relative" }} onClick={this.onOpen}>
-
-
-
-                        <img style={{ width: "25px", height: "25px" }} src={shoppingCart} />
-                        <span style={{
-                            position: "absolute",
-                            top: "-10px",
-                            right: "-10px",
-                            padding: "5px 10px",
-                            borderRadius: "50%",
-                            backgroundColor: "black",
-                            color: "white",
-                        }}>{this.props.cartProdutcts.length}</span>
-                    </button>
-
-                    {this.state.showShop ? <div style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        padding: "32px 16px",
-                        position: "absolute",
-                        width: "365px",
-                        right: "100px",
-                        top: "45px",
-                        background: "#FFFFFF",
-                    }}><MiniCard></MiniCard> </div> : null}
+                    </SelectDiv>
+                </div>
+                <div ref={this.wrapperRef}>
+                    <ShopButton onClick={this.onOpen}>
 
 
-                </NavBtn>
-            </Nav>
 
-        </>
+                        <ShopImg src={shoppingCart} />
+                        <ShopSpan>{this.props.cartProdutcts.length}</ShopSpan>
+                    </ShopButton>
+
+                    {this.state.showShop ? <ShopDiv><MiniCard ></MiniCard> </ShopDiv> : null}
+                </div>
+
+            </NavBtn>
+        </Nav>
+
+
     )
 }
 const mapStateToProps = (state) => {
@@ -107,12 +143,15 @@ const mapStateToProps = (state) => {
     return {
         categories: state.ProductsReducer.categories,
         cartProdutcts: state.ProductsReducer.cart,
+        currency: state.ProductsReducer.currency
+
     }
 }
 const mapDispatchToProps = () => {
     return {
         setSelectedCategories,
-        setCurrency
+        setCurrency,
+        showMiniCart
 
     }
 }

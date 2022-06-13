@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { cartProductCount, cartProductChangeAtr, checkOut } from '../Redux/redux-actions/redux_actions'
+import { cartProductCount, checkOut } from '../Redux/redux-actions/redux_actions';
 
 import {
     CounterButtons,
@@ -11,12 +11,15 @@ import {
     IncCardDiv,
     SummaryDiv,
     SumSpan,
-    PictureDiv,
-    PictureImg,
+    MiniPictureDiv,
     OthersBtns,
     SizeH33,
     TotalDiv,
-    ResultDiv
+    ResultDiv,
+    SliderDiv,
+    FlexDiv,
+    CartDiv,
+    ShopingButtons,
 } from './CartElements';
 import {
 
@@ -61,9 +64,9 @@ class MiniCarD extends Component {
     }
     calculateTotal = () => {
         let total = 0
-        this.props.cartProdutcts.filter(product => {
+        this.props.cartProdutcts.forEach(product => {
 
-            product.product.prices.filter(curr => {
+            product.product.prices.forEach(curr => {
 
                 if (curr.currency.symbol === this.props.currency) {
 
@@ -93,115 +96,94 @@ class MiniCarD extends Component {
             this.props.cartProductCount(payload)
         }
     };
-    onChangeAttribute = (currentAttribute, title, nextAttribute, id) => {
-
-        let attribut = this.props.cartProdutcts[currentAttribute].selectedAtributes.find(x => x.name == title);
-        attribut.value = nextAttribute.value
-
-        let payload = {
-            attribut: attribut,
-            id: id
-        }
-        this.props.cartProductChangeAtr(payload)
-
-
-    };
     onCheckOut = (e) => {
         e.preventDefault()
         this.props.checkOut()
     }
     render = () => (
-        <>
-            <div style={{
-                marginTop: "20px",
-                marginBottom: "20px",
-
-            }} >
+        <SliderDiv>
+            <CartDiv mini >
                 <CartSpan mini>My Bag: {this.props.cartProdutcts.length} items</CartSpan>
-            </div>
+            </CartDiv>
 
 
             {this.props.cartProdutcts.map((product, index) => {
 
 
-                return <>
+                return <div key={"mini-card-id" + index} >
+                    <CardDiv mini >
 
-                    <div key={"mini-card-id" + index} >
-                        <CardDiv mini >
+                        <ApolloDiv mini>{product.product.brand}</ApolloDiv>
 
-                            <ApolloDiv mini>{product.product.brand}</ApolloDiv>
+                        <RunningShortDiv mini>{product.product.name}</RunningShortDiv>
+                        <PriceDiv mini >{product.product.prices.map(curr => {
 
-                            <RunningShortDiv mini>{product.product.name}</RunningShortDiv>
-                            <PriceDiv mini >{product.product.prices.map(curr => {
+                            if (curr.currency.symbol === this.props.currency) {
+                                return curr.currency.symbol + curr.amount
+                            }
+                            return null
+                        })}
+                        </PriceDiv>
+                        <div  >
+                            {product.product.attributes.map((attribute) => {
 
-                                if (curr.currency.symbol === this.props.currency) {
-                                    return curr.currency.symbol + curr.amount
-                                }
+
+                                return <div key={attribute.id}><SizeH33 mini >{attribute.name}</SizeH33>
+                                    <FlexDiv>
+                                        {attribute.items.map(item => {
+                                            let active = true
+                                            let exists = product.selectedAtributes.find(x => x.value === item.value)
+                                            if (exists) {
+                                                active = false
+                                            }
+
+                                            return <OthersBtns color={attribute.name === "Color" ? item.value : null} mini isActive={active}
+
+                                                value={item.value} key={item.id} >{attribute.name === "Color" ? null : item.value}</OthersBtns>
+
+                                        })}
+
+                                    </FlexDiv>
+
+                                </div >
                             })}
-                            </PriceDiv>
-                            <div  >
-                                {product.product.attributes.map((attribute) => {
-
-
-                                    return <div key={attribute.id}><SizeH33 mini >{attribute.name}</SizeH33>
-                                        <div style={{ display: "flex" }} >
-                                            {attribute.items.map(item => {
-                                                let active = true
-                                                let exists = product.selectedAtributes.find(x => x.value == item.value)
-                                                if (exists) {
-                                                    active = false
-                                                }
-                                                let color = product.selectedAtributes[0].name
-
-                                                return <OthersBtns color={attribute.name == "Color" ? item.value : null} mini isActive={active}
-                                                    onClick={(e) => this.onChangeAttribute(index, attribute.name, item, product.product.id)}
-                                                    value={item.value} key={item.id} >{attribute.name == "Color" ? null : item.value}</OthersBtns>
-
-                                            })}
-
-                                        </div>
-
-                                    </div >
-                                })}
 
 
 
-                            </div>
+                        </div>
 
-                        </CardDiv >
-                        <IncCardDiv mini >
+                    </CardDiv >
+                    <IncCardDiv mini >
 
-                            <CounterButtons mini onClick={() => this.handleCount(product.count + 1, product.product.id)} >+</CounterButtons>
-                            <SummaryDiv mini><SumSpan mini>{product.count}</SumSpan></SummaryDiv>
-                            <CounterButtons mini onClick={() => this.handleCount(product.count - 1, product.product.id)}>-</CounterButtons>
-                        </IncCardDiv>
-                        <PictureDiv>
-                            <PictureImg mini
-                                src={product.product.gallery[this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected : 0]}
-                                alt="fireSpot" />
-                        </PictureDiv>
+                        <CounterButtons mini onClick={() => this.handleCount(product.count + 1, product.id)} >+</CounterButtons>
+                        <SummaryDiv mini><SumSpan mini>{product.count}</SumSpan></SummaryDiv>
+                        <CounterButtons mini onClick={() => this.handleCount(product.count - 1, product.id)}>-</CounterButtons>
+                    </IncCardDiv>
+                    <MiniPictureDiv mini img={product.product.gallery[this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected : 0]} >
+
+                    </MiniPictureDiv>
 
 
 
 
 
 
-                    </div>
+                </div>
 
-                </>
+
             })}
 
 
 
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "20px" }}><TotalDiv mini>Total:</TotalDiv><ResultDiv mini>{this.state.total}</ResultDiv></div>
-            <div style={{ display: "flex", justifyContent: "space-around" }}><BagLink
+            <ShopingButtons><TotalDiv mini>Total:</TotalDiv><ResultDiv mini>{this.state.total.toFixed(2)}</ResultDiv></ShopingButtons>
+            <ShopingButtons mini><BagLink
                 to={"/shopcard"}
 
             >
                 View Bag
             </BagLink><CheckButton onClick={this.onCheckOut}>Check out</CheckButton>
-            </div>
-        </>
+            </ShopingButtons>
+        </SliderDiv>
     );
 }
 const mapStateToProps = (state) => {
@@ -215,7 +197,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = () => {
     return {
         cartProductCount,
-        cartProductChangeAtr,
         checkOut
 
     }

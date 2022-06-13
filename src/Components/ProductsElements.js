@@ -5,17 +5,36 @@ export const ImagesDiv = styled.div`
 width: 80px;
 display: inline-block;
 vertical-align: top;
+margin-bottom:15px;
 `
-export const ImageFirst = styled.img`
+export const ImageFirst = styled.div`
 height: 80px;
 width: 80px;
 display:flex;
 flex-direction:column;
+
+background: url(${props => props.img});
+
+background-size: 100% ;
+background-position: center;
+
+background-repeat: no-repeat;
+
 `
-export const ImageBig = styled.img`
+export const ImageBig = styled.div`
 margin-left: 20px;
 width: 610px;
 height: 511px;
+
+background: url(${props => props.img});
+
+background-size: 100% ;
+background-position: center;
+
+background-repeat: no-repeat;
+
+
+
 `
 export const AddBtn = styled.button`
 padding: 16px 32px 16px 32px;
@@ -73,4 +92,17 @@ font-style: normal;
 font-weight: 700;
 font-size: 24px;
 `
+export const GalleryDiv = styled.div`
 
+display:flex;
+flex-direction:column;
+
+`
+export const MainProductDiv = styled.div`
+
+width: 100%;
+display: flex;
+justify-content: space-around;
+margin-top: 50px 
+
+`

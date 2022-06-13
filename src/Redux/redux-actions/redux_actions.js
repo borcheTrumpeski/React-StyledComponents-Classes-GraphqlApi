@@ -27,3 +27,6 @@ export function cartProductCount(payload) {
 export function cartProductChangeAtr(payload) {
   return { type: PRODUCTS_ACTION_TYPES.CHANGE_ATTRIBUTE, payload };
 }
+export function showMiniCart(payload) {
+  return { type: PRODUCTS_ACTION_TYPES.SHOW_MINI_CART, payload };
+}

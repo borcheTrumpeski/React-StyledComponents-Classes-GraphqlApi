@@ -1,21 +1,52 @@
-import styled from "styled-components"
+import styled from "styled-components";
+import { NavLink as Link } from "react-router-dom";
+
 
 export const GridContainer = styled.div`
 display: grid;
-width:97%;
+width:100%;
 grid-template-columns: 1fr 1fr 1fr;
-padding-left:3%;
+
 `
 export const Grid = styled.div`
 padding: 20px ;
 display: flex;
 `
+export const CategoryLink = styled(Link)`
+
+display:flex;
+align-items:center;
+height:100%;
+text-decoration:none;
+padding-bottom:2px;
+`
+export const CartImgContainer = styled.div`
+display: ${props => props.show ? "flex" : "none"};
+justify-content: flex-end;
+width: 100% ;
+`
+
+
+export const CartImg = styled.button`
+border-radius: 50%;
+border:none;
+background-color: #5ECE7B;
+width: 50px;
+ height: 50px;
+ justify-content: center;
+ align-items: center;
+ display: flex;
+ margin-top: -100px;
+ position: absolute;
+ margin-right: 50px
+`
+
 export const Card = styled.div`
+display:block;
+margin-left:30px;
 height: 444px;
 width: 386px;
-left: 0px;
-top: 0px;
-border-radius: 0px;
+
 `
 
 export const Tith1 = styled.h1`

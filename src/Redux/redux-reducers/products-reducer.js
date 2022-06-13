@@ -5,11 +5,11 @@ export const initialState = {
   selectedCategory: "",
   selectedProduct: "",
   currency: "",
-  cart: []
+  cart: [],
+  showMiniCart: false,
 };
 
 export const ProductsReducer = (state = initialState, action) => {
-
   switch (action.type) {
 
     case PRODUCTS_ACTION_TYPES.CHECKOUT: {
@@ -18,9 +18,16 @@ export const ProductsReducer = (state = initialState, action) => {
         cart: []
       };
     }
+    case PRODUCTS_ACTION_TYPES.SHOW_MINI_CART: {
+      return {
+        ...state,
+        showMiniCart: action.payload
+      };
+    }
+
     case PRODUCTS_ACTION_TYPES.CHANGE_COUNT: {
 
-      const index = state.cart.findIndex(item => item.product.id === action.payload.id); //finding index of the item
+      const index = state.cart.findIndex(item => item.id === action.payload.id); //finding index of the item
       const newArray = [...state.cart]; //making a new array
       newArray[index].count = action.payload.count//changing value in the new array
       return {

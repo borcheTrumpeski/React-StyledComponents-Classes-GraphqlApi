@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { cartProductCount, cartProductChangeAtr } from '../Redux/redux-actions/redux_actions';
+import { cartProductCount } from '../Redux/redux-actions/redux_actions';
 
 import {
     CounterButtons,
@@ -13,12 +13,15 @@ import {
     SummaryDiv,
     SumSpan,
     PictureDiv,
-    PictureImg,
+    CartDiv,
     OthersBtns,
     SizeH33,
     TotalDiv,
     ResultDiv,
-    TaxDiv
+    TaxDiv,
+    FlexDiv,
+    ScrollPictureButtons,
+    ScrollPictureDiv
 } from './CartElements';
 import { connect } from "react-redux";
 
@@ -56,9 +59,9 @@ class Cart extends Component {
     }
     calculateTotal = () => {
         let total = 0
-        this.props.cartProdutcts.filter(product => {
+        this.props.cartProdutcts.forEach(product => {
 
-            product.product.prices.filter(curr => {
+            product.product.prices.forEach(curr => {
 
                 if (curr.currency.symbol === this.props.currency) {
 
@@ -89,7 +92,7 @@ class Cart extends Component {
     };
     handleGallery = (selected, index, max) => {
 
-        if (selected != max && selected >= 0) {
+        if (selected !== max && selected >= 0) {
             let gallery = this.state.galleryImgs
             gallery[index].selected = selected
             this.setState({ galleryImgs: gallery });
@@ -97,27 +100,12 @@ class Cart extends Component {
 
 
     };
-    onChangeAttribute = (currentAttribute, title, nextAttribute, id) => {
-        let attribut = this.props.cartProdutcts[currentAttribute].selectedAtributes.find(x => x.name == title);
-        attribut.value = nextAttribute.value
-
-        let payload = {
-            attribut: attribut,
-            id: id
-        }
-        this.props.cartProductChangeAtr(payload)
-
-
-    };
 
     render = () => (
         <>
-            <div style={{
-                marginTop: "50px",
-                marginBottom: "50px"
-            }} >
+            <CartDiv >
                 <CartSpan>CART</CartSpan>
-            </div>
+            </CartDiv>
 
 
             {this.props.cartProdutcts.map((product, index) => {
@@ -136,28 +124,27 @@ class Cart extends Component {
                                 if (curr.currency.symbol === this.props.currency) {
                                     return curr.currency.symbol + curr.amount
                                 }
+                                return null
                             })}
                             </PriceDiv>
                             <div  >
                                 {product.product.attributes.map((attribute) => {
 
                                     return <div key={attribute.id}><SizeH33  >{attribute.name}</SizeH33>
-                                        <div style={{ display: "flex" }} >
+                                        <FlexDiv>
                                             {attribute.items.map(item => {
                                                 let active = true
-                                                let exists = product.selectedAtributes.find(x => x.value == item.value)
+                                                let exists = product.selectedAtributes.find(x => x.value === item.value)
                                                 if (exists) {
                                                     active = false
                                                 }
-                                                let color = product.selectedAtributes[0].name
 
-                                                return <OthersBtns color={attribute.name == "Color" ? item.value : null} isActive={active}
-                                                    onClick={(e) => this.onChangeAttribute(index, attribute.name, item, product.product.id)}
-                                                    value={item.value} key={item.id} >{attribute.name == "Color" ? null : item.value}</OthersBtns>
+                                                return <OthersBtns color={attribute.name === "Color" ? item.value : null} isActive={active}
+                                                    value={item.value} key={item.id} >{attribute.name === "Color" ? null : item.value}</OthersBtns>
 
                                             })}
 
-                                        </div>
+                                        </FlexDiv>
 
 
                                     </div >
@@ -173,14 +160,14 @@ class Cart extends Component {
                             <SummaryDiv><SumSpan>{product.count}</SumSpan></SummaryDiv>
                             <CounterButtons onClick={() => this.handleCount(product.count - 1, product.product.id)}>-</CounterButtons>
                         </IncCardDiv>
-                        <PictureDiv>
-                            <PictureImg
-                                src={product.product.gallery[this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected : this.state.galleryImgs[0]]}
-                                alt="fireSpot" />
-                        </PictureDiv>
-                        <button onClick={() => this.handleGallery(this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected + 1 : 0, index, product.product.gallery.length)}>+</button>
-                        <button onClick={() => this.handleGallery(this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected - 1 : 0, index, product.product.gallery.length)}>-</button>
+                        <PictureDiv img={product.product.gallery[this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected : this.state.galleryImgs[0]]}>
+                            <ScrollPictureDiv >
+                                <ScrollPictureButtons onClick={() => this.handleGallery(this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected + 1 : 0, index, product.product.gallery.length)}>{"<"}</ScrollPictureButtons>
+                                <ScrollPictureButtons onClick={() => this.handleGallery(this.state.galleryImgs.length > 0 ? this.state.galleryImgs[index].selected - 1 : 0, index, product.product.gallery.length)}>{">"}</ScrollPictureButtons>
+                            </ScrollPictureDiv>
 
+
+                        </PictureDiv>
 
 
 
@@ -191,9 +178,9 @@ class Cart extends Component {
             })}
 
 
-            <div style={{ display: "flex" }}><TaxDiv>Tax21% :</TaxDiv><ResultDiv>{this.state.tax}</ResultDiv></div>
-            <div style={{ display: "flex" }}><TaxDiv>Quantity:</TaxDiv> <ResultDiv>{this.state.quantity}</ResultDiv></div>
-            <div style={{ display: "flex" }}><TotalDiv>Total:</TotalDiv><ResultDiv>{this.state.total}</ResultDiv></div>
+            <FlexDiv><TaxDiv>Tax21% :</TaxDiv><ResultDiv>{this.state.tax.toFixed(2)}</ResultDiv></FlexDiv>
+            <FlexDiv><TaxDiv>Quantity:</TaxDiv> <ResultDiv>{this.state.quantity}</ResultDiv></FlexDiv>
+            <FlexDiv><TotalDiv>Total:</TotalDiv><ResultDiv>{this.state.total.toFixed(2)}</ResultDiv></FlexDiv>
         </>
     );
 }
@@ -208,7 +195,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = () => {
     return {
         cartProductCount,
-        cartProductChangeAtr
+
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps())(Cart)

@@ -101,12 +101,40 @@ font-size: ${props => (props.mini ? `16px ` : `24px`)};
 padding-right: ${props => (props.mini ? `6px ` : `15px`)};
 `
 export const PictureDiv = styled.div`
+flex-direction: row;
+flex-wrap: wrap;
+
+display: ${props => (props.category ? `flex` : `inline-block`)};
+justify-content: center;
+align-items: center;
+background: url(${props => props.img});
+opacity:${props => props.outOfStock ? "0.7" : "1"};
+background-size: 100% ;
+background-position: center;
+height: ${props => (props.category ? `310px` : `288px`)};
+background-repeat: no-repeat;
+width: ${props => (props.category ? `354px` : `141px`)};
+margin-left: ${props => (props.category ? `0px` : `30px`)};
+
+`
+
+export const MiniPictureDiv = styled.div`
+
 display: inline-block;
 margin-left: 30px;
+background: url(${props => props.img});
+background-size: 100% ;
+background-position: center;
+height:190px;
+background-repeat: no-repeat;
+width:121px;
+
+
 `
 export const PictureImg = styled.img.attrs((props) => props)`
 height: ${props => (props.mini ? `190px ` : `288px`)};
 width: ${props => (props.mini ? `121px ` : `141px`)};
+
  `
 
 export const TotalDiv = styled.div.attrs((props) => props)`
@@ -127,6 +155,44 @@ font-style: normal;
 font-weight: 400;
 font-size:24px;
  `
+export const FlexDiv = styled.div`
+ display:flex;
+ `
+export const CartDiv = styled.div.attrs((props) => props)`
+ margin-top: ${props => (props.mini ? `20px ` : `50px`)};
+ margin-bottom: ${props => (props.mini ? `20px ` : `50px`)};
+
+ `
+export const SliderDiv = styled.div`
+ max-height: 600px;
+ overflow: auto
+
+ `
+export const ShopingButtons = styled.div`
+ display: flex;
+ justify-content: space-between;
+ padding: ${props => (props.mini ? `0px ` : `20px`)};
+ `
+
+export const ScrollPictureButtons = styled.button`
+ border:  none;
+ width: 24px;
+height: 24px;
+background: rgba(0, 0, 0, 0.73);
+ color:white;
+ opacity:0.7;
+ margin-right:10px;
+ `
+export const ScrollPictureDiv = styled.div`
+ display: flex;
+ justify-content:flex-end;
+ margin-top:200px;
+ 
+ `
+
+
+
+
 
 
 
