@@ -167,7 +167,8 @@ height: 25px
 `
 export const ShopButton = styled.button`
 cursor:pointer;
-
+background: #FFFFFF;
+border:none;
 backgroundColor: white;
 position: relative 
 

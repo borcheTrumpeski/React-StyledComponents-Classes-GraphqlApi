@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { GridContainer, Grid, Card, Tith1, Styledspan, SpanPrice, CategoryLink, CartImgContainer, CartImg } from "../Components/CategoryElements";
 import { getCategoryByTitle, getProductById } from "../Components/ApiCalls";
-import { setSelectedCategories, setSelectedProduct, addToCard } from '../Redux/redux-actions/redux_actions';
+import { setSelectedCategories, setSelectedProduct, addToCard, cartProductCount } from '../Redux/redux-actions/redux_actions';
 import { PictureDiv } from '../Components/CartElements';
 import cartImg from "../Pictures/EmptyCart.png"
 class Category extends Component {
@@ -50,12 +50,42 @@ class Category extends Component {
       selectedAtrrs = res.data.product.attributes.map(el => {
         return { name: el.name, value: el.items[0].value }
       })
-      let submit = {
-        product: res.data.product,
-        selectedAtributes: selectedAtrrs,
-        count: 1
+
+      let exists = false
+      this.props.cartProdutcts.forEach(element => {
+        debugger
+
+        if (element.product.id === res.data.product.id) {
+          let same = true
+          element.selectedAtributes.forEach((atr, index) => {
+            if (same) {
+              same = atr.value === selectedAtrrs[index].value ? true : false
+            }
+          })
+          if (same) {
+            let payload = {
+              count: element.count + 1,
+              id: element.id
+            }
+            this.props.cartProductCount(payload)
+            exists = true
+            alert("Already exists" + res.data.product.name)
+          }
+        }
+      })
+      if (!exists) {
+
+        let submit = {
+          product: res.data.product,
+          selectedAtributes: selectedAtrrs,
+          count: 1,
+          id: this.props.cartProdutcts.length
+
+        }
+        this.props.addToCard(submit)
+        alert("Succesfully added " + res.data.product.name)
+
       }
-      this.props.addToCard(submit)
 
 
     })
@@ -100,7 +130,9 @@ class Category extends Component {
 const mapStateToProps = (state) => {
 
   return {
-    selectedCategory: state.ProductsReducer.selectedCategory
+    selectedCategory: state.ProductsReducer.selectedCategory,
+    cartProdutcts: state.ProductsReducer.cart,
+
   }
 }
 const mapDispatchToProps = () => {
@@ -108,6 +140,8 @@ const mapDispatchToProps = () => {
     setSelectedCategories,
     setSelectedProduct,
     addToCard,
+    cartProductCount
+
 
   }
 }

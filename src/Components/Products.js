@@ -75,16 +75,25 @@ class Products extends Component {
     }
     onChangeAttribute = (index, value) => {
 
+        let atrr = [...this.state.selectedAtributes]
+        let atrrr = this.state.selectedAtributes;
+
+
+        // atrr[index].value = value
         debugger
-        let b = this.props.cartProdutcts[this.props.cartProdutcts.length - 1].selectedAtributes[0].value
-        console.log(b)
-        let atr = this.state.selectedAtributes;
+        // 1. Make a shallow copy of the items
+        let items = [...this.state.selectedAtributes]
+        // 2. Make a shallow copy of the item you want to mutate
+        let item = { ...items[index] }
+        // 3. Replace the property you're intested in
+        item.value = value
+        // 4. Put it back into our array. N.B. we *are* mutating the array here, but that's why we made a copy first
+        items[index] = item;
+        // 5. Set the state to our new copy
+        this.setState({ selectedAtributes: items });
 
-        atr[index].value = value
-        let a = this.props.cartProdutcts[this.props.cartProdutcts.length - 1].selectedAtributes[0].value
-        console.log(a)
 
-        this.setState({ selectedAtributes: atr })
+
 
     }
     addToCard = () => {
@@ -111,10 +120,7 @@ class Products extends Component {
                 }
             }
         })
-        debugger
-        // if (exists !== null) {
-        //     exists.filter(el => el.selectedAtributes.find(x=>x.name==))
-        // }
+
         if (!exists) {
             let submit = {
                 product: this.state.product,

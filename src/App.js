@@ -5,6 +5,7 @@ import Category from './Views/Category';
 import Products from "./Components/Products";
 import Cart from './Components/Cart';
 import { getProducts } from "./Components/ApiCalls";
+import "./App.css"
 
 import { connect } from "react-redux";
 import { setCategories, } from './Redux/redux-actions/redux_actions';
